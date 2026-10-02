@@ -80,7 +80,7 @@ int main(void){
     /* ESP8266 AP mode + TCP server */
     ESP8266_StaTcpClient_Unvarnish_ConfigTest();
 
-    /* 初始化 PC 下发命令的 3 个 GPIO (PE4/PE5/PE6), 初始低电平 */
+    /* 初始化 PC 下发命令的 4 个 GPIO (PE4/PE5/PE6/PC2), 初始低电平 */
     wifi_cmd_init();
 
     last_snapshot_tick = HAL_GetTick();

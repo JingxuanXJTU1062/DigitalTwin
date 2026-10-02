@@ -5,48 +5,60 @@
 #include "X_V5.h"
 #include "Motor.h"
 #include "PWM.h"
-#include <stdio.h>
 #include "ttp223.h"
-uint8_t flag = 1;
-/**
-	*	@brief		MAIN
-	*	@param		
-	*	@retval		
-	*/
+
+static void Feed_Stop(void)
+{
+    Emm_V5_Stop_Now(1, 0);
+    Emm_V5_Stop_Now(3, 0);
+    X_V5_Stop_Now(2, 0);
+}
+
+static void Feed_Start(void)
+{
+    Emm_V5_Vel_Control(1, 0, 50, 0, 0);
+    delay_ms(200);
+    if (!TTP223_ReadState()) {
+        Feed_Stop();
+        return;
+    }
+
+    Emm_V5_Vel_Control(3, 1, 35, 0, 0);
+    delay_ms(200);
+    if (!TTP223_ReadState()) {
+        Feed_Stop();
+        return;
+    }
+
+    X_V5_Vel_Control(2, 1, 65535, 500, 0);
+}
+
 int main(void)
 {
-	board_init();
-	
-	TTP223_Init();
-	delay_ms(3000);
+    uint8_t last_control_state = 2U;
 
-	Emm_V5_En_Control(1, 1, 0);
-	delay_ms(100);
+    board_init();
+    TTP223_Init();
+    delay_ms(3000);
 
-	Emm_V5_En_Control(3, 1, 0);
-	delay_ms(100);
-	
+    Emm_V5_En_Control(1, 1, 0);
+    delay_ms(100);
+    Emm_V5_En_Control(3, 1, 0);
+    delay_ms(100);
+    X_V5_En_Control(2, 1, 0);
+    delay_ms(100);
 
-	X_V5_En_Control(2, 1, 0);
-	delay_ms(100);
+    while (1) {
+        uint8_t control_state = TTP223_ReadState() ? 1U : 0U;
 
-	while(1)
-	{
-
-		
-		if(TTP223_GetTouchFlag() && flag)
-        {
-            TTP223_ClearTouchFlag();
-			Emm_V5_Vel_Control(1,0,50,0,0);
-			delay_ms(200);
-			Emm_V5_Vel_Control(3,1,35,0,0);
-			delay_ms(200);
-			X_V5_Vel_Control(2, 1, 65535, 500, 0);
-			delay_ms(200); 
-			flag = 0;
-			
+        if (control_state != last_control_state) {
+            if (control_state) {
+                Feed_Start();
+            } else {
+                Feed_Stop();
+            }
+            last_control_state = control_state;
         }
-		delay_ms(100);
-
-	}
+        delay_ms(100);
+    }
 }

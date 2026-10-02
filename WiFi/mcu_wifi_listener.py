@@ -163,7 +163,7 @@ class ModbusTcpClient:
         if pdu != bytes([0x0F]) + struct.pack(">HH", address, len(values)):
             raise ModbusProtocolError("invalid write-multiple-coils response")
 
-    def read_coils(self, address=0, quantity=3):
+    def read_coils(self, address=0, quantity=4):
         pdu = self.exchange(0x01, struct.pack(">HH", address, quantity))
         expected_bytes = (quantity + 7) // 8
         if len(pdu) != 2 + expected_bytes or pdu[1] != expected_bytes:
@@ -175,7 +175,8 @@ class ModbusTcpClient:
 # ============================================================
 FLAG1 = 1   # F407 -> PE4  (Watch 变量 g_cmd_flag1)
 FLAG2 = 1   # F407 -> PE5  (Watch 变量 g_cmd_flag2)
-FLAG3 = 1  # F407 -> PE6  (Watch 变量 g_cmd_flag3)
+FLAG3 = 1   # F407 -> PE6  (Watch 变量 g_cmd_flag3)
+FLAG4 = 1   # F407 -> PC2  (Watch 变量 g_cmd_flag4)
 # ============================================================
 
 # ============================================================
@@ -464,11 +465,12 @@ def connect_with_retry():
 
 
 # ============================================================
-# ★ 控制帧发送线程 (向 F407 周期性发 $CMD,f1,f2,f3*CS)
+# ★ 控制帧发送线程 (向 F407 周期性发 $CMD,f1,f2,f3,f4*CS)
 # ============================================================
-def build_cmd_packet(f1: int, f2: int, f3: int) -> bytes:
-    """构建 $CMD,<f1>,<f2>,<f3>*CS\\r\\n (XOR 校验范围: $ 和 * 之间)"""
-    body = f"CMD,{int(f1) & 1},{int(f2) & 1},{int(f3) & 1}"
+def build_cmd_packet(f1: int, f2: int, f3: int, f4: int) -> bytes:
+    """构建 $CMD,<f1>,<f2>,<f3>,<f4>*CS\\r\\n (XOR 校验范围: $ 和 * 之间)"""
+    body = (f"CMD,{int(f1) & 1},{int(f2) & 1},"
+            f"{int(f3) & 1},{int(f4) & 1}")
     cs = 0
     for ch in body:
         cs ^= ord(ch)
@@ -504,7 +506,7 @@ class CmdSender:
                 time.sleep(self._interval_s)
                 continue
             try:
-                pkt = build_cmd_packet(FLAG1, FLAG2, FLAG3)
+                pkt = build_cmd_packet(FLAG1, FLAG2, FLAG3, FLAG4)
                 sock.sendall(pkt)
                 self.tx_count += 1
                 self.last_packet = pkt
@@ -528,8 +530,9 @@ def legacy_main():
     print(f"  连接: {ESP8266_IP}:{ESP8266_PORT} (TCP)")
     print("  协议: NMEA 风格 $FRAME 合并包 (5 路: J:0x01, P:0x02, C:0x05, D:0x03, I:0x04)")
     print("  请先确认 PC 已连接 WiFi 热点 BinghuoLink (密码: wildfire123)")
-    print("  ★ 控制位: FLAG1=%d -> PE4, FLAG2=%d -> PE5, FLAG3=%d -> PE6"
-          % (FLAG1, FLAG2, FLAG3))
+    print("  ★ 控制位: FLAG1=%d -> PE4, FLAG2=%d -> PE5, "
+          "FLAG3=%d -> PE6, FLAG4=%d -> PC2"
+          % (FLAG1, FLAG2, FLAG3, FLAG4))
     print(f"  ★ $CMD 帧发送间隔: {CMD_INTERVAL_S:.2f}s")
     print("  按 Ctrl+C 退出")
     print("=" * 70)
@@ -761,7 +764,7 @@ def _print_resync_warning(client):
 def main():
     print("STM32F407 数字孪生 Modbus TCP 主机")
     print(f"连接 {ESP8266_IP}:{ESP8266_PORT}, Unit ID={UNIT_ID}, 输入寄存器 0..29")
-    print(f"线圈 0..2 -> PE4/PE5/PE6: {FLAG1}/{FLAG2}/{FLAG3}")
+    print(f"线圈 0..3 -> PE4/PE5/PE6/PC2: {FLAG1}/{FLAG2}/{FLAG3}/{FLAG4}")
     client = ModbusTcpClient()
     last_sequence, sequence_gaps, last_coil_refresh = None, 0, 0.0
     while True:
@@ -782,7 +785,7 @@ def main():
             last_sequence = sequence
             now = time.monotonic()
             if now - last_coil_refresh >= CMD_INTERVAL_S:
-                expected = [bool(FLAG1), bool(FLAG2), bool(FLAG3)]
+                expected = [bool(FLAG1), bool(FLAG2), bool(FLAG3), bool(FLAG4)]
                 client.write_multiple_coils(expected)
                 _print_resync_warning(client)
                 actual = client.read_coils()

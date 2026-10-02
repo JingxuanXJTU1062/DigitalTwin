@@ -5,7 +5,7 @@
 
 #define MODBUS_TCP_UNIT_ID               1U
 #define MODBUS_INPUT_REGISTER_COUNT      30U
-#define MODBUS_COIL_COUNT                 3U
+#define MODBUS_COIL_COUNT                 4U
 #define MODBUS_TCP_MAX_ADU_SIZE         260U
 
 typedef void (*ModbusTcp_CoilWriteCallback)(uint8_t index, uint8_t value);

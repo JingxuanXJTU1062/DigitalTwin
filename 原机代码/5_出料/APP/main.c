@@ -1,52 +1,58 @@
 #include "board.h"
 #include "delay.h"
 #include "usart.h"
-#include "Emm_V5.h"
-#include "X_V5.h"
-#include "Motor.h"
-#include "PWM.h"
 #include <stdio.h>
 #include "ttp223.h"
 #include "PressureSensor.h"
-uint8_t flag = 1;
-/**
-	*	@brief		MAIN
-	*	@param		
-	*	@retval		
-	*/
+
+#define PRESSURE_TRIGGER_VOLTAGE  0.035f
+#define START_DELAY_TICKS         20U
+
 int main(void)
 {
-	uint16_t pressure_raw = 0;
-	float pressure_voltage = 0.0f;
+    uint8_t last_enable_state = 2U;
+    uint8_t pressure_armed = 1U;
+    uint8_t start_delay_ticks = 0U;
 
-	board_init();
-	PressureSensor_Init();
-	
+    board_init();
+    PressureSensor_Init();
+    TTP223_Init();
+    delay_ms(3000);
 
-	delay_ms(3000);
-	
+    while (1) {
+        uint8_t enabled = TTP223_ReadState() ? 1U : 0U;
 
-	uint8_t pressure_pressed_last = 0;
-	while(1)
-	{
-        pressure_raw = PressureSensor_ReadRawAverage(1);
-		pressure_voltage = ((float)pressure_raw * 3.3f) / 4095.0f;
-//		printf("Pressure Raw=%u, Voltage=%.3fV\r\n", pressure_raw, pressure_voltage);
-		if(pressure_voltage < 0.035f && pressure_pressed_last == 0)
-			{
-								
-				pressure_pressed_last = 1;
-				delay_ms(2000);
-				printf("MOTOR_START\r\n");
-				delay_ms(300);
-			}
+        if (!enabled) {
+            if (last_enable_state != 0U) {
+                printf("MOTOR_STOP\r\n");
+            }
+            start_delay_ticks = 0U;
+            pressure_armed = 1U;
+            last_enable_state = 0U;
+            delay_ms(100);
+            continue;
+        }
 
-			// 松开后，允许下一次物体重新触发
-			if(pressure_voltage >= 0.035f)
-			{
-				pressure_pressed_last = 0;
-			}
-		delay_ms(100);
+        last_enable_state = 1U;
+        {
+            uint16_t pressure_raw = PressureSensor_ReadRawAverage(1);
+            float pressure_voltage = ((float)pressure_raw * 3.3f) / 4095.0f;
 
-	}
+            if (pressure_voltage >= PRESSURE_TRIGGER_VOLTAGE) {
+                pressure_armed = 1U;
+            }
+
+            if (start_delay_ticks > 0U) {
+                --start_delay_ticks;
+                if (start_delay_ticks == 0U && TTP223_ReadState()) {
+                    printf("MOTOR_START\r\n");
+                }
+            } else if (pressure_voltage < 0.035f && pressure_armed) {
+                pressure_armed = 0U;
+                start_delay_ticks = START_DELAY_TICKS;
+            }
+        }
+
+        delay_ms(100);
+    }
 }
