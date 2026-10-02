@@ -1,0 +1,64 @@
+//uint16_t filt = 0;
+//uint8_t flag = 1;
+//int main(void)
+//{
+//    board_init();  
+////	TTP223_Init();
+//	delay_ms(3000);
+////	if (!VL53_App_Init()) 
+////	{
+////		printf("VL53 init failed!\r\n");
+////		while (1) 
+////		{
+////			delay_ms(100);
+////		}
+////	}
+////	printf("VL53 init OK\r\n");
+////	Motor_Init();
+////	delay_ms(1000);
+////	Motor1_SetSpeed(-15);
+////	delay_ms(100);
+//	Emm_V5_En_Control(1, true, false);
+//	delay_ms(100);
+////	Emm_V5_Vel_Control(1,1,50,0,0);
+//    Emm_V5_Origin_Modify_Params(1, true, 2, 0, 200, 8000, 100, 800, 60, false);
+//	delay_ms(500);
+//	Emm_V5_Origin_Trigger_Return(1, 2, 0);
+//	delay_ms(5000);
+//	
+////	Emm_V5_Pos_Control(1,1,200,0,3200,2,0);
+////	delay_ms(3000);
+
+////	Gripper_t gripper;
+////	Gripper_Init(&gripper);
+
+//	while (1)
+//	{	
+////		if(TTP223_GetTouchFlag() && flag)
+////        {
+////            TTP223_ClearTouchFlag();
+////			Emm_V5_Vel_Control(1,1,200,0,0);
+////			delay_ms(300);
+////			flag = 0;
+////        }
+////		
+////		
+////		bool update_ok = VL53_App_Update();
+////		bool dist_valid = VL53_App_IsDataValid();
+////		uint16_t filt = VL53_App_GetFiltMM();
+
+////		if (!update_ok)
+////		{
+////			VL53_App_RestartRanging();
+////			printf("VL53: restart ranging\r\n");
+////		}
+////		printf("filt=%u\r\n",filt);
+
+////		Gripper_Update(&gripper, dist_valid, filt, ir_sensor_blocked());
+//		
+//		
+//		delay_ms(150);
+//	}
+//			
+
+//}

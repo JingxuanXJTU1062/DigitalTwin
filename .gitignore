@@ -1,0 +1,38 @@
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Keil generated outputs and per-user UI state
+**/Objects/
+**/Listings/
+**/Output/
+*.o
+*.d
+*.crf
+*.axf
+*.hex
+*.lnp
+*.map
+*.lst
+*.dep
+*.build_log.htm
+*.uvguix.*
+*.lib
+*.a
+
+# STM32CubeIDE / CMake generated outputs
+**/build/
+**/Debug/
+**/Release/
+**/.settings/
+*.launch
+
+# Local editor and workflow state
+.vscode/
+.superpowers/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*~
