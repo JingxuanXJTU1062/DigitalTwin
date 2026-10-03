@@ -32,9 +32,11 @@ extern "C" {
 #define HALL_PULSES_PER_REV     1U        /* 磁钢数量 */
 #define HALL_EDGES_PER_REV      1U        /* 每转IC边沿数(单磁钢单极=1,双极=2) */
 #define HALL_BASE_TIMEOUT_MS             5000U     /* 常规停转判定基准 */
-#define HALL_REACQUIRE_TIMEOUT_MS       20000U     /* 首次/超慢周期捕获窗口 */
+#define HALL_REACQUIRE_TIMEOUT_MS       10000U     /* 尚无可信周期时最多等待10s */
 #define HALL_MIN_VALID_PERIOD_US      1800000U     /* 正常最短约2s，留10%裕量 */
-#define HALL_TIMEOUT_PERIOD_MULTIPLIER      2U     /* 慢速时允许等待最近周期的2倍 */
+#define HALL_TIMEOUT_PERIOD_NUMERATOR       3U     /* 自适应超时 = 最近周期的3/2 */
+#define HALL_TIMEOUT_PERIOD_DENOMINATOR     2U
+#define HALL_TIMEOUT_MAX_MS             10000U     /* 停转判定最长等待10s */
 
 /*========================== 模块参数 ==========================*/
 #define MODULE_ID             0x02     /* 霍尔+压力模块ID */

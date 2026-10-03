@@ -27,9 +27,11 @@
 
 /* 霍尔周期有效范围与自适应停转策略 */
 #define HALL_BASE_TIMEOUT_MS             5000U
-#define HALL_REACQUIRE_TIMEOUT_MS       20000U
+#define HALL_REACQUIRE_TIMEOUT_MS       10000U
 #define HALL_MIN_VALID_PERIOD_US      1800000U
-#define HALL_TIMEOUT_PERIOD_MULTIPLIER      2U
+#define HALL_TIMEOUT_PERIOD_NUMERATOR       3U
+#define HALL_TIMEOUT_PERIOD_DENOMINATOR     2U
+#define HALL_TIMEOUT_MAX_MS             10000U
 
 #ifdef __cplusplus
 extern "C" {

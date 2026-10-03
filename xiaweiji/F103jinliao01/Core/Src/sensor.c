@@ -111,9 +111,13 @@ static uint32_t calc_omega(uint32_t period_us)
  */
 static uint32_t hall_get_timeout_ms(uint32_t period_us)
 {
-    uint64_t adaptive_ms = ((uint64_t)period_us * HALL_TIMEOUT_PERIOD_MULTIPLIER) / 1000U;
+    uint64_t adaptive_ms = ((uint64_t)period_us * HALL_TIMEOUT_PERIOD_NUMERATOR) /
+                           (1000U * HALL_TIMEOUT_PERIOD_DENOMINATOR);
     if (adaptive_ms < HALL_BASE_TIMEOUT_MS) {
         return HALL_BASE_TIMEOUT_MS;
+    }
+    if (adaptive_ms > HALL_TIMEOUT_MAX_MS) {
+        return HALL_TIMEOUT_MAX_MS;
     }
     return (adaptive_ms > 0xFFFFFFFFU) ? 0xFFFFFFFFU : (uint32_t)adaptive_ms;
 }
@@ -273,7 +277,7 @@ void Sensor_UpdateHall(void)
 
     period_used = hall_period_from_samples(s);
 
-    /* 已有可信周期时自适应；首次捕获仍保留20s慢速识别窗口。 */
+    /* 已有可信周期时自适应；首次捕获最多保留10s慢速识别窗口。 */
     uint32_t elapsed = now_ms - s->last_edge_tick;
     uint32_t timeout_ms = (period_used > 0U) ? hall_get_timeout_ms(period_used)
                                              : HALL_REACQUIRE_TIMEOUT_MS;
