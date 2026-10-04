@@ -10,7 +10,9 @@
 static void Feed_Stop(void)
 {
     Emm_V5_Stop_Now(1, 0);
+    delay_ms(20);
     Emm_V5_Stop_Now(3, 0);
+    delay_ms(20);
     X_V5_Stop_Now(2, 0);
 }
 
@@ -35,7 +37,8 @@ static void Feed_Start(void)
 
 int main(void)
 {
-    uint8_t last_control_state = 2U;
+    uint8_t is_running = 0U;
+    uint8_t stop_sent = 0U;
 
     board_init();
     TTP223_Init();
@@ -51,13 +54,18 @@ int main(void)
     while (1) {
         uint8_t control_state = TTP223_ReadState() ? 1U : 0U;
 
-        if (control_state != last_control_state) {
-            if (control_state) {
+        if (control_state) {
+            stop_sent = 0U;
+            if (!is_running) {
                 Feed_Start();
-            } else {
-                Feed_Stop();
+                is_running = TTP223_ReadState() ? 1U : 0U;
             }
-            last_control_state = control_state;
+        } else {
+            if (is_running || !stop_sent) {
+                Feed_Stop();
+                stop_sent = 1U;
+            }
+            is_running = 0U;
         }
         delay_ms(100);
     }

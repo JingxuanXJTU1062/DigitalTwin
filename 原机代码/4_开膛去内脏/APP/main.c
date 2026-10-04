@@ -11,8 +11,11 @@
 static void Gutting_Stop(void)
 {
     X_V5_Stop_Now(1, 0);
+    delay_ms(20);
     X_V5_Stop_Now(2, 0);
+    delay_ms(20);
     X_V5_Stop_Now(3, 0);
+    delay_ms(20);
     Motor1_SetSpeed(0);
 }
 
@@ -55,7 +58,9 @@ static void Process_Discharge_Command(void)
     if (!rxFrameFlag) return;
 
     rxFrameFlag = false;
-    if (Command_Equals(rxCmd, rxCount, "MOTOR_START")) {
+    if (Command_Equals(rxCmd, rxCount, "MOTOR_RUN")) {
+        Emm_V5_Vel_Control(1, 1, 100, 0, 0);
+    } else if (Command_Equals(rxCmd, rxCount, "MOTOR_START")) {
         Emm_V5_Pos_Control(1, 1, 100, 0, 25000, 2, 0);
     } else if (Command_Equals(rxCmd, rxCount, "MOTOR_STOP")) {
         Emm_V5_Stop_Now(1, 0);
@@ -66,7 +71,8 @@ static void Process_Discharge_Command(void)
 
 int main(void)
 {
-    uint8_t last_control_state = 2U;
+    uint8_t is_running = 0U;
+    uint8_t stop_sent = 0U;
 
     board_init();
     Motor_Init();
@@ -84,13 +90,21 @@ int main(void)
 
     while (1) {
         uint8_t control_state = TTP223_ReadState() ? 1U : 0U;
-        if (control_state != last_control_state) {
-            if (control_state) Gutting_Start();
-            else Gutting_Stop();
-            last_control_state = control_state;
+        if (control_state) {
+            stop_sent = 0U;
+            if (!is_running) {
+                Gutting_Start();
+                is_running = TTP223_ReadState() ? 1U : 0U;
+            }
+        } else {
+            if (is_running || !stop_sent) {
+                Gutting_Stop();
+                stop_sent = 1U;
+            }
+            is_running = 0U;
         }
 
         Process_Discharge_Command();
-        delay_ms(10);
+        delay_ms(100);
     }
 }
