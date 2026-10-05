@@ -3,7 +3,7 @@
 <title>Static Call Graph - [F103chuliao05\F103chuliao05.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image F103chuliao05\F103chuliao05.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Wed Sep 30 08:24:11 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Mon Oct 05 14:49:56 2026
 <BR><P>
 <H3>Maximum Stack Usage =        152 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -67,7 +67,7 @@ Function Pointers
  <LI><a href="#[32]">SPI2_IRQHandler</a> from startup_stm32f103xb.o(.text) referenced from startup_stm32f103xb.o(RESET)
  <LI><a href="#[a]">SVC_Handler</a> from stm32f1xx_it.o(i.SVC_Handler) referenced from startup_stm32f103xb.o(RESET)
  <LI><a href="#[d]">SysTick_Handler</a> from stm32f1xx_it.o(i.SysTick_Handler) referenced from startup_stm32f103xb.o(RESET)
- <LI><a href="#[39]">SystemInit</a> from system_stm32f1xx_1.o(i.SystemInit) referenced from startup_stm32f103xb.o(.text)
+ <LI><a href="#[39]">SystemInit</a> from system_stm32f1xx.o(i.SystemInit) referenced from startup_stm32f103xb.o(.text)
  <LI><a href="#[10]">TAMPER_IRQHandler</a> from startup_stm32f103xb.o(.text) referenced from startup_stm32f103xb.o(RESET)
  <LI><a href="#[26]">TIM1_BRK_IRQHandler</a> from startup_stm32f103xb.o(.text) referenced from startup_stm32f103xb.o(RESET)
  <LI><a href="#[29]">TIM1_CC_IRQHandler</a> from startup_stm32f103xb.o(.text) referenced from startup_stm32f103xb.o(RESET)
@@ -963,7 +963,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[46]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[39]"></a>SystemInit</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, system_stm32f1xx_1.o(i.SystemInit))
+<P><STRONG><a name="[39]"></a>SystemInit</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, system_stm32f1xx.o(i.SystemInit))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f103xb.o(.text)
 </UL>
 <P><STRONG><a name="[2b]"></a>TIM3_IRQHandler</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, stm32f1xx_it.o(i.TIM3_IRQHandler))
@@ -1115,7 +1115,7 @@ Global Symbols
 <H3>
 Local Symbols
 </H3>
-<P><STRONG><a name="[74]"></a>hall_get_timeout_ms</STRONG> (Thumb, 52 bytes, Stack size 8 bytes, sensor.o(i.hall_get_timeout_ms))
+<P><STRONG><a name="[74]"></a>hall_get_timeout_ms</STRONG> (Thumb, 70 bytes, Stack size 8 bytes, sensor.o(i.hall_get_timeout_ms))
 <BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = hall_get_timeout_ms &rArr; __aeabi_uldivmod
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uldivmod

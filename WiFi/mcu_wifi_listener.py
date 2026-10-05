@@ -175,8 +175,8 @@ class ModbusTcpClient:
 # ============================================================
 FLAG1 = 1   # F407 -> PE4  (Watch 变量 g_cmd_flag1)
 FLAG2 = 1   # F407 -> PE5  (Watch 变量 g_cmd_flag2)
-FLAG3 = 1   # F407 -> PE6  (Watch 变量 g_cmd_flag3)
-FLAG4 = 1   # F407 -> PC2  (Watch 变量 g_cmd_flag4)
+FLAG3 = 0   # F407 -> PE6  (Watch 变量 g_cmd_flag3)
+FLAG4 = 0   # F407 -> PC2  (Watch 变量 g_cmd_flag4)
 # ============================================================
 
 # ============================================================
